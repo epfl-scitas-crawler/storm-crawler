@@ -124,5 +124,12 @@
 			<artifactId>storm-crawler-tika</artifactId>
 			<version>${stormcrawler.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.digitalpebble.stormcrawler</groupId>
+			<artifactId>storm-crawler-warc</artifactId>
+			<version>${stormcrawler.version}</version>
+		</dependency>
+
+
 	</dependencies>
 </project>
