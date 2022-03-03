@@ -26,6 +26,42 @@ spouts:
       - "seeds.txt"
       - true
 
+components:
+  - id: "WARCFileNameFormat"
+    className: "com.digitalpebble.stormcrawler.warc.WARCFileNameFormat"
+    configMethods:
+      - name: "withPath"
+        args:
+          - "/home/ec2-user/warcs"
+      - name: "withPrefix"
+        args:
+          - "my-warc-prefix"
+
+  - id: "WARCFileRotationPolicy"
+    className: "org.apache.storm.hdfs.bolt.rotation.FileSizeRotationPolicy"
+    constructorArgs:
+      - 50.0
+      - MB
+
+  - id: "WARCInfo"
+    className: "java.util.LinkedHashMap"
+    configMethods:
+      - name: "put"
+        args:
+         - "software"
+         - "StormCrawler 2.2 http://stormcrawler.net/"
+      - name: "put"
+        args:
+         - "format"
+         - "WARC File Format 1.0"
+      - name: "put"
+        args:
+         - "conformsTo"
+         - "https://iipc.github.io/warc-specifications/specifications/warc-format/warc-1.0/"
+
+config:
+  warc: {"fs.file.impl": "org.apache.hadoop.fs.RawLocalFileSystem"}
+
 bolts:
   - id: "filter"
     className: "com.digitalpebble.stormcrawler.bolt.URLFilterBolt"
@@ -60,6 +96,23 @@ bolts:
   - id: "status_metrics"
     className: "com.digitalpebble.stormcrawler.elasticsearch.metrics.StatusMetricsBolt"
     parallelism: 1
+  - id: "warc"
+    className: "com.digitalpebble.stormcrawler.warc.WARCHdfsBolt"
+    parallelism: 1
+    configMethods:
+      - name: "withFileNameFormat"
+        args:
+          - ref: "WARCFileNameFormat"
+      - name: "withRotationPolicy"
+        args:
+          - ref: "WARCFileRotationPolicy"
+      - name: "withRequestRecords"
+      - name: "withHeader"
+        args:
+          - ref: "WARCInfo"
+      - name: "withConfigKey"
+        args:
+          - "warc"
 
 streams:
   - from: "spout"
@@ -81,6 +134,11 @@ streams:
 
   - from: "fetcher"
     to: "sitemap"
+    grouping:
+      type: LOCAL_OR_SHUFFLE
+
+  - from: "fetcher"
+    to: "warc"
     grouping:
       type: LOCAL_OR_SHUFFLE
 
