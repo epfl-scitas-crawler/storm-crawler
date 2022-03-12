@@ -16,7 +16,7 @@ package com.digitalpebble.stormcrawler.bolt;
 
 import static com.digitalpebble.stormcrawler.Constants.StatusStreamName;
 import static com.digitalpebble.stormcrawler.Constants.WarcStreamName;
-//import static com.digitalpebble.stormcrawler.Constants.Warc2StreamName;
+import static com.digitalpebble.stormcrawler.Constants.Warc2StreamName;
 
 import com.digitalpebble.stormcrawler.Constants;
 import com.digitalpebble.stormcrawler.Metadata;
