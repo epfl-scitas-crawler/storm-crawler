@@ -179,25 +179,22 @@ public class JSoupParserBolt extends StatusEmitterBolt {
         Metadata metadata = (Metadata) tuple.getValueByField("metadata");
 
 	
-        // If metadata.FORCE_ARCHIVE set to "yes", archive on Warc2StreamName,
+	// If metadata.FORCE_ARCHIVE set to "yes", archive on Warc2StreamName,
         // return without parsing!
-	/*
-        String forceArchive = (metadata.getFirstValue("FORCE_ARCHIVE"));
-        LOG.info("forceArchive for parent homepage: {}? {}", url, forceArchive);
-
-        if ( forceArchive != null && forceArchive.equals("yes") ) {
-            LOG.info("Parsing : Forced archiving of parent homepage: {}", url);
-            collector.emit(Warc2StreamName,
-                           tuple,
-                           new Values(url, content, metadata));
-            collector.emit(StatusStreamName,
-                           tuple,
-                           new Values(url, metadata, Status.FETCHED));
-            collector.ack(tuple);
-            eventCounter.scope("tuple_success").incr();	
-            return;
-        }
-	*/
+	//String forceArchive = (metadata.getFirstValue("FORCE_ARCHIVE"));
+        //LOG.info("forceArchive for parent homepage: {}? {}", url, forceArchive);
+        //if ( forceArchive != null && forceArchive.equals("yes") ) {
+        //    LOG.info("Parsing : Forced archiving of parent homepage: {}", url);
+        //    collector.emit(Warc2StreamName,
+        //                   tuple,
+        //                   new Values(url, content, metadata));
+        //    collector.emit(StatusStreamName,
+        //                   tuple,
+        //                   new Values(url, metadata, Status.FETCHED));
+        //    collector.ack(tuple);
+        //    eventCounter.scope("tuple_success").incr();	
+        //    return;
+        //}
 	
         LOG.info("Parsing : starting {}", url);
 
