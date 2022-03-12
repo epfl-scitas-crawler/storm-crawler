@@ -15,6 +15,8 @@
 package com.digitalpebble.stormcrawler.bolt;
 
 import static com.digitalpebble.stormcrawler.Constants.StatusStreamName;
+import static com.digitalpebble.stormcrawler.Constants.WarcStreamName;
+//import static com.digitalpebble.stormcrawler.Constants.Warc2StreamName;
 
 import com.digitalpebble.stormcrawler.Constants;
 import com.digitalpebble.stormcrawler.Metadata;
@@ -93,6 +95,11 @@ public class JSoupParserBolt extends StatusEmitterBolt {
 
     private boolean robots_noFollow_strict = true;
 
+    private static final PatentRegex patentRegex    = new PatentRegex();
+    //private static ParentURLs parentUrls = new ParentURLs();
+
+    
+
     /**
      * If a Tuple is not HTML whether to send it to the status stream as an error or pass it on the
      * default stream
@@ -167,6 +174,26 @@ public class JSoupParserBolt extends StatusEmitterBolt {
         String url = tuple.getStringByField("url");
         Metadata metadata = (Metadata) tuple.getValueByField("metadata");
 
+	/*
+        // If metadata.FORCE_ARCHIVE set to "yes", archive on Warc2StreamName,
+        // return without parsing!
+        String forceArchive = (metadata.getFirstValue("FORCE_ARCHIVE"));
+        LOG.info("forceArchive for parent homepage: {}? {}", url, forceArchive);
+
+        if ( forceArchive != null && forceArchive.equals("yes") ) {
+            LOG.info("Parsing : Forced archiving of parent homepage: {}", url);
+            collector.emit(Warc2StreamName,
+                           tuple,
+                           new Values(url, content, metadata));
+            collector.emit(StatusStreamName,
+                           tuple,
+                           new Values(url, metadata, Status.FETCHED));
+            collector.ack(tuple);
+            eventCounter.scope("tuple_success").incr();	
+            return;
+        }
+	*/
+	
         LOG.info("Parsing : starting {}", url);
 
         // check that its content type is HTML
@@ -387,6 +414,45 @@ public class JSoupParserBolt extends StatusEmitterBolt {
             handleException(url, e, metadata, tuple, "content filtering", errorMessage);
             return;
         }
+
+	// Parse for patent mention
+        // If regex is positive send url to Warc stream for archiving
+
+        //LOG.info("REGEX on string of length {} ({}).", text.length(), url);
+
+        long startTime  = System.currentTimeMillis();
+        //boolean matches = patentRegex.detectPatentMentionIn( text );
+        boolean matches = patentRegex.detectPatentKeywordMentionIn( text );
+        //boolean matches = false;
+        long endTime    = System.currentTimeMillis();
+        LOG.info("html REGEX execution time {}: {} msec ({})", matches, (endTime - startTime), url);
+
+        //EO: if the regex matches:
+        //     - we emit the tuple on the WARC stream (VPM WARC)
+        //     - but we do not ack it yet, it will be ack by the warc bolt
+        //     - we get the list of possible parent URLs, emitted with status "DISCOVERED"
+        //       and with the metadata.FORCE_ARCHIVE set to "yes"
+        // ---------------------------------------------------------------
+        if ( matches ) {
+            LOG.info("Patent mention detector positive match on url: " + url);
+            collector.emit(WarcStreamName,
+                           tuple,
+                           new Values(url, content, metadata));
+
+            // Get homepages url
+            ArrayList<String> parents = parentUrls.getListOfParentUrls( url );
+            LOG.info("Adding homepages with force archiving option enabled for domains of url: {}", url);
+	    
+            for (String parentUrl : parents) {
+                LOG.info(" --- adding parent url: {}", parentUrl);
+                Metadata parentMetadata = new Metadata();
+                parentMetadata.setValue("FORCE_ARCHIVE", "yes");
+                collector.emit(StatusStreamName,
+                               new Values(parentUrl, parentMetadata, Status.DISCOVERED));
+            }
+        }
+
+	
 
         if (emitOutlinks) {
             final List<Outlink> outlinksAfterLimit =
