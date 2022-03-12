@@ -519,6 +519,9 @@ public class JSoupParserBolt extends StatusEmitterBolt {
         // output of this module is the list of fields to index
         // with at least the URL, text content
         declarer.declare(new Fields("url", "content", "metadata", "text"));
+	declarer.declareStream(WarcStreamName,  new Fields("url", "content", "metadata"));
+        declarer.declareStream(Warc2StreamName, new Fields("url", "content", "metadata"));
+ 
     }
 
     public String guessMimeType(String URL, String httpCT, byte[] content) {
