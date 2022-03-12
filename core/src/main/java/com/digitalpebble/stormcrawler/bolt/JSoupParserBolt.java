@@ -95,7 +95,7 @@ public class JSoupParserBolt extends StatusEmitterBolt {
 
     private boolean robots_noFollow_strict = true;
 
-    private static final PatentRegex patentRegex    = new PatentRegex();
+    private static final PatentRegex patentRegex = new PatentRegex();
     //private static ParentURLs parentUrls = new ParentURLs();
 
     
