@@ -36,6 +36,7 @@ import com.digitalpebble.stormcrawler.util.CharsetIdentification;
 import com.digitalpebble.stormcrawler.util.ConfUtils;
 import com.digitalpebble.stormcrawler.util.RefreshTag;
 import com.digitalpebble.stormcrawler.util.RobotsTags;
+import com.digitalpebble.stormcrawler.util.PatentRegex;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
