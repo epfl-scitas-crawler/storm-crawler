@@ -37,6 +37,7 @@ import com.digitalpebble.stormcrawler.util.ConfUtils;
 import com.digitalpebble.stormcrawler.util.RefreshTag;
 import com.digitalpebble.stormcrawler.util.RobotsTags;
 import com.digitalpebble.stormcrawler.util.PatentRegex;
+import com.digitalpebble.stormcrawler.util.ParentURLs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.metric.api.MultiCountMetric;
 import org.apache.storm.task.OutputCollector;
@@ -97,7 +99,7 @@ public class JSoupParserBolt extends StatusEmitterBolt {
     private boolean robots_noFollow_strict = true;
 
     private static final PatentRegex patentRegex = new PatentRegex();
-    //private static ParentURLs parentUrls = new ParentURLs();
+    private static ParentURLs parentUrls = new ParentURLs();
 
     
 
