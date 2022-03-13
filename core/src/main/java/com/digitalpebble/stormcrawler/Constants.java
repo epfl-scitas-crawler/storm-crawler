@@ -27,8 +27,8 @@ public class Constants {
     public static final String STATUS_ERROR_CAUSE = "error.cause";
 
     public static final String StatusStreamName = "status";
-    public static final String WarcStreamName   = "warc";
-    public static final String Warc2StreamName  = "warc2";
+    public static final String WarcStreamName = "warc";
+    public static final String Warc2StreamName = "warc2";
 
     public static final String DELETION_STREAM_NAME = "deletion";
 
