@@ -15,6 +15,8 @@
 package com.digitalpebble.stormcrawler.tika;
 
 import static com.digitalpebble.stormcrawler.Constants.StatusStreamName;
+import static com.digitalpebble.stormcrawler.Constants.Warc2StreamName;
+import static com.digitalpebble.stormcrawler.Constants.WarcStreamName;
 
 import com.digitalpebble.stormcrawler.Constants;
 import com.digitalpebble.stormcrawler.Metadata;
@@ -90,6 +92,9 @@ public class ParserBolt extends BaseRichBolt {
 
     private String protocolMDprefix;
 
+    private static ParentURLs parentUrls = new ParentURLs();
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void prepare(
             @NotNull Map<String, Object> conf,
@@ -175,6 +180,30 @@ public class ParserBolt extends BaseRichBolt {
             return;
         }
 
+        // EODEB
+        // If metadata.FORCE_ARCHIVE set to "yes", archive on Warc2StreamName,
+        // return without parsing!
+        /*
+               String forceArchive = (metadata.getFirstValue("FORCE_ARCHIVE"));
+
+               if ( forceArchive != null && forceArchive.equals("yes") ) {
+                   System.out.println(" >>> TIKA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Force archive of parent homepage: " + url);
+                   collector.emit(Warc2StreamName,
+                                  tuple,
+                                  new Values(url, content, metadata));
+
+                   collector.emit(StatusStreamName,
+                                  tuple,
+                                  new Values(url, metadata, Status.FETCHED));
+
+                   collector.ack(tuple);
+
+                   eventCounter.scope("tuple_success").incr();
+
+                   return;
+               }
+        */
+
         long start = System.currentTimeMillis();
 
         ByteArrayInputStream bais = new ByteArrayInputStream(content);
@@ -259,6 +288,34 @@ public class ParserBolt extends BaseRichBolt {
         parseData.setMetadata(metadata);
         parseData.setText(text);
         parseData.setContent(content);
+
+        // Parse for patent mention
+        // If regex is positive send url to Warc stream for archiving
+
+        long startTime = System.currentTimeMillis();
+        // boolean matches = patentRegex.detectPatentMentionIn( text );
+        boolean matches = patentRegex.detectPatentKeywordMentionIn(text);
+        long endTime = System.currentTimeMillis();
+        LOG.info("tika REGEX execution time {}: {} msec ({})", matches, (endTime - startTime), url);
+
+        if (matches) {
+            LOG.info("Tika patent mention detector positive match on url: " + url);
+            collector.emit(WarcStreamName, tuple, new Values(url, content, metadata));
+
+            // Get homepages url
+            ArrayList<String> parents = parentUrls.getListOfParentUrls(url);
+            LOG.info(
+                    "Adding homepages with force archiving option enabled for domains of url: {}",
+                    url);
+
+            for (String parentUrl : parents) {
+                LOG.info(" --- adding parent url: {}", parentUrl);
+                Metadata parentMetadata = new Metadata();
+                parentMetadata.setValue("FORCE_ARCHIVE", "yes");
+                collector.emit(
+                        StatusStreamName, new Values(parentUrl, parentMetadata, Status.DISCOVERED));
+            }
+        }
 
         // apply the parse filters if any
         try {
@@ -349,6 +406,8 @@ public class ParserBolt extends BaseRichBolt {
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("url", "content", "metadata", "text"));
         declarer.declareStream(StatusStreamName, new Fields("url", "metadata", "status"));
+        declarer.declareStream(WarcStreamName, new Fields("url", "content", "metadata"));
+        declarer.declareStream(Warc2StreamName, new Fields("url", "content", "metadata"));
     }
 
     private List<Outlink> toOutlinks(String parentURL, List<Link> links, Metadata parentMetadata) {
