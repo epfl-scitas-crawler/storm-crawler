@@ -32,6 +32,7 @@ import com.digitalpebble.stormcrawler.protocol.ProtocolResponse;
 import com.digitalpebble.stormcrawler.util.ConfUtils;
 import com.digitalpebble.stormcrawler.util.InitialisationUtil;
 import com.digitalpebble.stormcrawler.util.MetadataTransfer;
+import com.digitalpebble.stormcrawler.util.ParentURLs;
 import com.digitalpebble.stormcrawler.util.URLUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -180,29 +181,22 @@ public class ParserBolt extends BaseRichBolt {
             return;
         }
 
-        // EODEB
         // If metadata.FORCE_ARCHIVE set to "yes", archive on Warc2StreamName,
         // return without parsing!
-        /*
-               String forceArchive = (metadata.getFirstValue("FORCE_ARCHIVE"));
+        String forceArchive = (metadata.getFirstValue("FORCE_ARCHIVE"));
+        if (forceArchive != null && forceArchive.equals("yes")) {
+            System.out.println(
+                    " >>> TIKA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Force archive of parent homepage: "
+                            + url);
+            collector.emit(Warc2StreamName, tuple, new Values(url, content, metadata));
 
-               if ( forceArchive != null && forceArchive.equals("yes") ) {
-                   System.out.println(" >>> TIKA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Force archive of parent homepage: " + url);
-                   collector.emit(Warc2StreamName,
-                                  tuple,
-                                  new Values(url, content, metadata));
+            collector.emit(StatusStreamName, tuple, new Values(url, metadata, Status.FETCHED));
 
-                   collector.emit(StatusStreamName,
-                                  tuple,
-                                  new Values(url, metadata, Status.FETCHED));
+            collector.ack(tuple);
 
-                   collector.ack(tuple);
-
-                   eventCounter.scope("tuple_success").incr();
-
-                   return;
-               }
-        */
+            eventCounter.scope("tuple_success").incr();
+            return;
+        }
 
         long start = System.currentTimeMillis();
 
