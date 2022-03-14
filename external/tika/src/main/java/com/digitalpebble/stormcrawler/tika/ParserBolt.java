@@ -33,6 +33,7 @@ import com.digitalpebble.stormcrawler.util.ConfUtils;
 import com.digitalpebble.stormcrawler.util.InitialisationUtil;
 import com.digitalpebble.stormcrawler.util.MetadataTransfer;
 import com.digitalpebble.stormcrawler.util.ParentURLs;
+import com.digitalpebble.stormcrawler.util.PatentRegex;
 import com.digitalpebble.stormcrawler.util.URLUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -94,6 +95,8 @@ public class ParserBolt extends BaseRichBolt {
     private String protocolMDprefix;
 
     private static ParentURLs parentUrls = new ParentURLs();
+
+    private static PatentRegex patentRegex = new PatentRegex();
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
