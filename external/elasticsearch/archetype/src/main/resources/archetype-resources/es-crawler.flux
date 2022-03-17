@@ -215,12 +215,6 @@ streams:
         constructorArgs:
           - "byDomain"
 
-  - from: "status"
-    to: "deleter"
-    grouping:
-      type: LOCAL_OR_SHUFFLE
-      streamId: "deletion"
-
   - from: "parse"
     to: "warc"
     grouping:
