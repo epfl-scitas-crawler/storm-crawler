@@ -35,11 +35,13 @@ config:
    - isSitemap
    - isFeed
 
-  http.agent.name: "Anonymous Coward"
-  http.agent.version: "1.0"
   http.agent.description: "built with StormCrawler Elasticsearch Archetype ${StormCrawlerVersion}"
-  http.agent.url: "http://someorganization.com/"
-  http.agent.email: "someone@someorganization.com"
+  http.agent.name: "E. Orliac, G. Fourestey"
+  http.agent.version: "2.3"
+  http.agent.description: "A Patent Crawler"
+  http.agent.url: "http://scitas.epfl.ch/"
+  http.agent.email: "etienne.orliac@epfl.ch, gilles.fourestey@epfl.ch"
+
 
   http.protocol.implementation: "com.digitalpebble.stormcrawler.protocol.okhttp.HttpProtocol"
   https.protocol.implementation: "com.digitalpebble.stormcrawler.protocol.okhttp.HttpProtocol" 
@@ -49,7 +51,8 @@ config:
   # The maximum number of bytes for returned HTTP response bodies.
   # The fetched page will be trimmed to 65KB in this case
   # Set -1 to disable the limit.
-  http.content.limit: 65536
+  #http.content.limit: 65536
+  http.content.limit: 2000000
 
   # FetcherBolt queue dump => comment out to activate
   # if a file exists on the worker machine with the corresponding port number
@@ -86,6 +89,9 @@ config:
 
   # needed for parsing with Tika
   jsoup.treat.non.html.as.error: false
+
+  parser.emitOutlinks: false
+
 
   # restrics the documents types to be parsed with Tika
   parser.mimetype.whitelist:
