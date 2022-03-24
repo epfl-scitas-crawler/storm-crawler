@@ -35,7 +35,7 @@ components:
           - "/home/ec2-user/warcs"
       - name: "withPrefix"
         args:
-          - "my-warc-prefix"
+          - "vpm"
 
   - id: "WARCFileRotationPolicy"
     className: "org.apache.storm.hdfs.bolt.rotation.FileSizeRotationPolicy"
