@@ -1,4 +1,13 @@
 #
+## Howto integrate changes from upstreams
+#
+git checkout master
+https://github.com/epfl-scitas-crawler/storm-crawler fetch upstream + merge (master)
+git pull
+git checkout patent-crawler
+git merge master
+
+#
 ## How to change maxDepth of crawler
 #
 edit external/elasticsearch/archetype/src/main/resources/archetype-resources/src/main/resources/urlfilters.json
