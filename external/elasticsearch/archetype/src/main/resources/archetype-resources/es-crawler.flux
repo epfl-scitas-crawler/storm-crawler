@@ -13,6 +13,10 @@ includes:
       file: "es-conf.yaml"
       override: true
 
+    - resource: false
+      file: "crawler-conf-tuning.yaml"
+      override: true
+
 spouts:
   - id: "spout"
     className: "com.digitalpebble.stormcrawler.elasticsearch.persistence.AggregationSpout"

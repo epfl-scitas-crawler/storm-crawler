@@ -22,3 +22,10 @@ git push
 cat pub_ip.txt
 scp -i ~/.ssh/frankfurt.pem ec2-user@3.127.139.239:~/warcs/* .
 scp vpm-*warc.gz orliac@helvetios.epfl.ch:/work/scitas-share/davidp/run_20220324_01
+
+#
+## How to edit the Flux topology
+#
+edit external/elasticsearch/archetype/src/main/resources/archetype-resources/es-crawler.flux
+git commit -m "XXXXX" external/elasticsearch/archetype/src/main/resources/archetype-resources/es-crawler.flux
+git push
