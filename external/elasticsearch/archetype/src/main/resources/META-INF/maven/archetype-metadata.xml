@@ -24,6 +24,7 @@
         <include>README.md</include>
         <include>ES_IndexInit.sh</include>
         <include>es-crawler.flux</include>
+        <include>es-crawler-resume.flux</include>
         <include>crawler-conf.yaml</include>
 	<include>es-conf.yaml</include>
 	<include>seeds.txt</include>
