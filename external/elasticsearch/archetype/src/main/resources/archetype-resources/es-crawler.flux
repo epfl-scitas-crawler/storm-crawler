@@ -81,7 +81,7 @@ bolts:
     parallelism: 1
   - id: "parse"
     className: "com.digitalpebble.stormcrawler.bolt.JSoupParserBolt"
-    parallelism: 1
+    parallelism: 2
   - id: "shunt"
     className: "com.digitalpebble.stormcrawler.tika.RedirectionBolt"
     parallelism: 1 
